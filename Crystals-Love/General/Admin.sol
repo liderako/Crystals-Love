@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 contract Admin {
 
 	address private _admin;
-
+	/* - */
 	function 	Admin( address admin ) public {
 		assertNULL();
 		_admin = admin;
@@ -14,7 +14,7 @@ contract Admin {
 			require( false );
 		return true;
 	}
-
+	/* - */
 	function 	assertNULL() internal view returns ( bool ){
 		if ( admin == address( 0x0 ) )
 			require( false );

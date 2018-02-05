@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
 
 contract safeMath {
-	
+	/* + */
 	function 	add( uint x, uint y ) pure internal returns ( uint ) {
 		uint 	z;
 
@@ -11,7 +11,7 @@ contract safeMath {
 		}
 		return 	z;
 	}
-
+	/* + */
 	function 	sub( uint x, uint y ) pure internal returns ( uint ) {
 		uint 	z;
 
@@ -21,7 +21,7 @@ contract safeMath {
 		}
 		return 	z;
 	}
-
+	/* - */
 	function 	mul( uint a, uint b ) internal pure returns ( uint256 ) {
 		uint 	c;
 

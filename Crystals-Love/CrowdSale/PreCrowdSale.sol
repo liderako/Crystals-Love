@@ -111,13 +111,15 @@ contract 	PreCrowdSale is Admin, WhiteList {
 	*/ 
 	// need test
 	function 	withdrawalAdmin() public payable {
+		uint 	amount;
 		assertBool(_crowdSaleClosed, false);
 		assertBool(_crowdSaleSuccess, false);
 		assertAdmin();
-
+	
+		amount = _amountRaised;
 		_amountRaised = 0;
-		msg.sender.transfer(_amountRaised);
-		WithdrawEther(msg.sender, _amountRaised);
+		msg.sender.transfer(amount);
+		WithdrawEther(msg.sender, amount);
 	}
 	
 	/*

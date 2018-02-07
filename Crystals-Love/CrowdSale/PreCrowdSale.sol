@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
 
 import 	"browser/Admin.sol";
-import 	"browser/SafeMathSell.sol";
+import 	"browser/SafeMathSale.sol";
 import	"browser/WhiteList.sol";
 
 interface 	Token {

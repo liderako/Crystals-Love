@@ -23,7 +23,7 @@ contract Token is ERC20, Admin {
 	function 	freezingTokens(uint amount)  public returns (bool) {
 		assertAdmin();
 
-		if (_balanceOf[getAdmin()] <= amount) {
+		if (_balanceOf[getAdmin()] < amount || amount == 0) {
 			require(false);
 		}
 		if ( _freezingTokens > 0 ) {

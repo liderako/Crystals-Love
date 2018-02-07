@@ -42,7 +42,7 @@ contract 	PreCrowdSale is Admin, WhiteList {
     */ 
 	// "0x671d481e28f3e9bdf525f43ae656cd668f71aebb", "0x627306090abab3a6e1400e9345bc60c78a8bef57", "72", "10"
 	function 	PreCrowdSale(address addressOfTokenUsedAsReward, address moderator, uint rate, uint timeOfDeadLine)
-					Admin(msg.sender) WhiteList(moderator) public payable {
+					Admin(msg.sender) WhiteList(moderator) public {
 		require(addressOfTokenUsedAsReward != address(0x0));
 		require(rate > 0);
 

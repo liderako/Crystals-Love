@@ -19,16 +19,18 @@ contract Token is ERC20, Admin {
 		 _deadlineForToken = now + time * 1 minutes;
 	}
 	
-	/* + */	
+	/* - */	
 	function 	freezingTokens(uint amount)  public returns (bool) {
 		assertAdmin();
 
 		if (_balanceOf[getAdmin()] <= amount) {
 			require(false);
 		}
+		if ( _freezingTokens > 0 ) {
+		    require( false );
+		}
 		_balanceOf[getAdmin()] = sub( _balanceOf[getAdmin()], amount );
 		_freezingTokens = amount;
-
 		FreezingTokens(getAdmin(), amount);
 		return 	true;
 	}
@@ -47,8 +49,8 @@ contract Token is ERC20, Admin {
 		DefrostingTokens(getAdmin(), amount);
 		return 	true;
 	}
-	/* - */
-	function    getTime() public constant returns(uint) {
+	/* + */
+	function    getNow() public constant returns(uint) {
 		return now;
 	}
 	/* - */

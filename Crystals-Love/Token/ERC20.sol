@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 import "browser/SafeMathToken.sol";
 import "browser/IERC20.sol";
 
-contract 	ERC20 is safeMath, IERC20 {
+contract 	ERC20 is SafeMathToken, IERC20 {
 	uint	public _totalSupply;
 	string 	public	_name;
 	string	public	_symbol;

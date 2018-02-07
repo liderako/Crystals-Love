@@ -5,12 +5,12 @@ import 	"browser/SafeMathSell.sol";
 import	"browser/WhiteList.sol";
 
 interface 	Token {
-	function 	transfer(address _to, uint256 _value) public returns (bool success);
+	function 	transfer(address _to, uint _value) public returns (bool success);
 }
 
 contract 	PreCrowdSale is Admin, WhiteList {
 
-	using SafeMathSale for uint256;
+	using SafeMathSale for uint;
 
 	Token 	public 	_tokenReward;
 	uint 	public	_rate;

@@ -29,7 +29,7 @@ contract Token is ERC20, Admin {
         _editEnd = true;
         return 	true;
     }
-	/* - */	
+	/* + */	
 	function 	freezingTokens(uint amount)  public returns (bool) {
 		assertAdmin();
 
@@ -46,7 +46,7 @@ contract Token is ERC20, Admin {
 		return 	true;
 	}
 
-	/* - */
+	/* + */
 	function 	defrostingTokens() public returns (bool) {
 		uint 	amount;
 
@@ -60,18 +60,16 @@ contract Token is ERC20, Admin {
 		DefrostingTokens(getAdmin(), amount);
 		return 	true;
 	}
-	
 	/*
-	**	This is function need for burn tokens crowdSale.
-    	** 	@param uint amount tokens for burn.
-	*/
-	function 	burn( uint amount ) public returns ( bool ) {
-        	require( _balanceOf[msg.sender] >= amount );
-        	require( msg.sender == _crowdSale );
-
-        	_balanceOf[msg.sender] -= amount;
-		_totalSupply -= amount;
-		
+    * 	This is function need for burn tokens crowdSale.
+    * 	@param uint amount tokens for burn.
+    */
+    function 	burn( uint amount ) public returns ( bool ) {
+        require( _balanceOf[msg.sender] >= amount );
+        require( msg.sender == _crowdSale );
+        
+        _balanceOf[msg.sender] = sub( _balanceOf[msg.sender], amount );
+        _totalSupply = sub( _balanceOf[msg.sender], amount );
 		Burn( msg.sender, amount );
 		return true;
 	}
@@ -83,7 +81,7 @@ contract Token is ERC20, Admin {
 	function    getNow() public constant returns(uint) {
 		return now;
 	}
-	/* - */
+	/* + */
 	function    assertTimeFrosing() view internal {
 		if (now <= _deadlineForToken) {
 			require(false);

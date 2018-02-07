@@ -15,7 +15,7 @@ contract Token is ERC20, Admin {
 	*	construct for remix solidity
 	*/ 
 	function 	Token(string nameToken, string symbolToken, uint supply, uint8 decimals, uint time)
-				ERC20(nameToken, symbolToken, supply, decimals) Admin(msg.sender) public payable {
+				ERC20(nameToken, symbolToken, supply, decimals) Admin(msg.sender) public {
 		 _deadlineForToken = now + time * 1 minutes;
 	}
 	

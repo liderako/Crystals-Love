@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
-contract SafeMathToken {
+library SafeMathToken {
 	function 	add(uint x, uint y) pure internal returns (uint) {
 		uint 	z;
 

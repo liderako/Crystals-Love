@@ -1,7 +1,6 @@
 pragma solidity ^0.4.18;
-pragma solidity ^0.4.18;
 
-import "browser/safeMath.sol";
+import "browser/SafeMathToken.sol";
 import "browser/IERC20.sol";
 
 contract 	ERC20 is safeMath, IERC20 {

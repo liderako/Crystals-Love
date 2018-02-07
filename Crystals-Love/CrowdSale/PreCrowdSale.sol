@@ -10,7 +10,7 @@ interface 	Token {
 
 contract 	PreCrowdSale is Admin, WhiteList {
 
-	using SafeMathSell for uint256;
+	using SafeMathSale for uint256;
 
 	Token 	public 	_tokenReward;
 	uint 	public	_rate;

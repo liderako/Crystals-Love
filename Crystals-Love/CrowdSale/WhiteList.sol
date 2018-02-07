@@ -7,30 +7,43 @@ contract 	WhiteList {
 	address public	_moderator;
 	
 	mapping ( address => bool ) internal _listAuthorizedUser;
-	/* - */
+	
+	/*
+	** If moderator == 0x0, then revert moderator.
+	*/
 	function 	WhiteList( address moderator ) public {
-		require( moderator != address( 0x0 ) );
+		assertNULL( moderator );
 		_moderator = moderator;
 	}
-	/* - */
+	
+	/*
+	** Add the user to the whitelist.
+	** The function is available only moderator.
+	** If user == 0x0, then revert transaction.
+	**/
 	function 	setAuthorizeUser( address user ) public {	
-		require( user != address( 0x0 ) );
+		assertNULL( user );
 		assertModerator();
-
+		
 		_listAuthorizedUser[user] = true;
 	}
-	/* + */
+	
 	function 	getAuthorizeUser( address user ) public constant returns( bool ) {
 		return 	_listAuthorizedUser[user];
 	}
-	/* + */
+
 	function 	assertModerator() view internal {
 		if ( msg.sender != _moderator )
 			require( false );
 	}
-	/* + */
+
 	function 	assertUserAuthorized( address user ) view internal {
 		if ( _listAuthorizedUser[user] == false )
 			require( false );
+	}
+
+	function    assertNULL( address user ) pure internal {
+	    if ( user == address( 0x0 ))
+	        require( false );
 	}
 }

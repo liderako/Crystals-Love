@@ -26,7 +26,7 @@ contract Token is ERC20, Admin {
 		if (_balanceOf[getAdmin()] <= amount) {
 			require(false);
 		}
-		_balanceOf[getAdmin()] = _balanceOf[getAdmin()].sub(amount);
+		_balanceOf[getAdmin()] = sub( _balanceOf[getAdmin()], amount );
 		_freezingTokens = amount;
 
 		FreezingTokens(getAdmin(), amount);
@@ -42,7 +42,7 @@ contract Token is ERC20, Admin {
 
 		amount = _freezingTokens;
 		_freezingTokens = 0;
-		_balanceOf[getAdmin()] = _balanceOf[getAdmin()].add(amount);
+		_balanceOf[getAdmin()] = add( _balanceOf[getAdmin()], amount ); 
 
 		DefrostingTokens(getAdmin(), amount);
 		return 	true;

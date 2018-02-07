@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
-contract SafeMathSall {
+contract SafeMathSale {
 
 	function mul(uint256 a, uint256 b) internal pure returns (uint256) {
 		if (a == 0) {

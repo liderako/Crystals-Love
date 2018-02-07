@@ -4,14 +4,14 @@ import 	"browser/ERC20.sol";
 import 	"browser/Admin.sol";
 
 contract Token is ERC20, Admin {
-	uint 	public 	_freezingTokens;
+	uint 	private _freezingTokens;
 	uint    public  _deadlineForToken; // Later named another name 
 
 	event 	FreezingTokens(address admin, uint amount);
 	event 	DefrostingTokens(address admin, uint amount);
 
 	/* 
-	*	"NameToken","SSS","43200","18", "5"
+	*	"NameToken","SSS","42000000","18", "5"
 	*	construct for remix solidity
 	*/ 
 	function 	Token(string nameToken, string symbolToken, uint supply, uint8 decimals, uint time)
@@ -24,11 +24,12 @@ contract Token is ERC20, Admin {
 		assertAdmin();
 
 		if (_balanceOf[getAdmin()] < amount || amount == 0) {
-			require(false);
+			require( false );
 		}
 		if ( _freezingTokens > 0 ) {
 		    require( false );
 		}
+		amount = amount * (10 ** uint( _decimals ));
 		_balanceOf[getAdmin()] = sub( _balanceOf[getAdmin()], amount );
 		_freezingTokens = amount;
 		FreezingTokens(getAdmin(), amount);
@@ -48,6 +49,10 @@ contract Token is ERC20, Admin {
 
 		DefrostingTokens(getAdmin(), amount);
 		return 	true;
+	}
+	/* + */
+	function    getFreezingTokens() public constant returns ( uint amount ) {
+	    return _freezingTokens / (10 ** uint( _decimals ));
 	}
 	/* + */
 	function    getNow() public constant returns(uint) {

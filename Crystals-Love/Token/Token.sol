@@ -20,7 +20,7 @@ contract Token is ERC20, Admin {
 				ERC20(nameToken, symbolToken, supply, decimals) Admin(msg.sender) public {
 		 _deadlineForToken = now + time * 1 minutes;
 	}
-	/* + */
+
     function 	setAddressCrowdSale( address smartContract ) public returns ( bool ) {
     	assertAdmin();
         require( _editEnd == false );
@@ -29,7 +29,7 @@ contract Token is ERC20, Admin {
         _editEnd = true;
         return 	true;
     }
-	/* + */	
+
 	function 	freezingTokens(uint amount)  public returns (bool) {
 		assertAdmin();
 
@@ -46,7 +46,7 @@ contract Token is ERC20, Admin {
 		return 	true;
 	}
 
-	/* + */
+
 	function 	defrostingTokens() public returns (bool) {
 		uint 	amount;
 
@@ -73,15 +73,15 @@ contract Token is ERC20, Admin {
 		Burn( msg.sender, amount );
 		return true;
 	}
-	/* + */
+
 	function    getFreezingTokens() public constant returns ( uint amount ) {
 	    return _freezingTokens / (10 ** uint( _decimals ));
 	}
-	/* + */
+
 	function    getNow() public constant returns(uint) {
 		return now;
 	}
-	/* + */
+
 	function    assertTimeFrosing() view internal {
 		if (now <= _deadlineForToken) {
 			require(false);

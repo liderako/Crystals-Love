@@ -39,16 +39,18 @@ contract 	PreCrowdSale is Admin, WhiteList {
 	
 	/*
     **   Constructor
-    */ 
-	// "0x671d481e28f3e9bdf525f43ae656cd668f71aebb", "0x627306090abab3a6e1400e9345bc60c78a8bef57", "72", "10"
-	function 	PreCrowdSale(address addressOfTokenUsedAsReward, address moderator, uint rate, uint timeOfDeadLine)
-					Admin(msg.sender) WhiteList(moderator) public {
+    */
+	// "0xa54fbd3339dc1a6082718852072b82dde3403865", "0x627306090abab3a6e1400e9345bc60c78a8bef57", "7000", "10"
+	function 	PreCrowdSale(address addressOfTokenUsedAsReward, address moderator, uint rate, uint startPresale, uint timeOfDeadLine)
+					Admin(msg.sender) WhiteList(moderator) public payable {
 		require(addressOfTokenUsedAsReward != address(0x0));
 		require(rate > 0);
+		require(startPresale > now);
+		require(startPresale < timeOfDeadLine);
 
 		_tokenReward = Token(addressOfTokenUsedAsReward);
 		_rate = rate;
-		_startPreSale = now;
+		_startPreSale = startPresale;
 		_deadlinePreSale = now + timeOfDeadLine * 1 minutes;
 	}
 
@@ -65,25 +67,25 @@ contract 	PreCrowdSale is Admin, WhiteList {
 		assertUserAuthorized(msg.sender);   // check if user is authorized
 
 		amount = msg.value;
-		remain = MIN_ETHER_RAISED - _amountRaised;
+		remain = MIN_ETHER_RAISED.sub(_amountRaised);
 		require(amount <= remain); // check if remain <= _amountRaised
 
 		_balanceOf[msg.sender] = _balanceOf[msg.sender].add(amount);
 		_amountRaised = _amountRaised.add(amount);
+		goalManagement();
 		_tokenReward.transfer(msg.sender, amount.mul(_rate));
-		goalManagement(amount);
+		DepositEther(msg.sender, amount);
 	}
 	
 	/*
 	**   Function for check goal reaching
 	*/ 
-	function 	goalManagement(uint amount) public {
+	function 	goalManagement() private {
 		if (_amountRaised >= MIN_ETHER_RAISED) { // check current balance
 			_crowdSaleClosed = true;
 			_crowdSaleSuccess = true;
 			GoalReached(_amountRaised, _crowdSaleSuccess);
 		}
-		DepositEther(msg.sender, amount);
 	}
 
 	/*

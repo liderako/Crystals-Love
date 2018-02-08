@@ -42,7 +42,7 @@ contract 	PreCrowdSale is Admin, WhiteList {
     */
 	// "0xa54fbd3339dc1a6082718852072b82dde3403865", "0x627306090abab3a6e1400e9345bc60c78a8bef57", "7000", "10"
 	function 	PreCrowdSale(address addressOfTokenUsedAsReward, address moderator, uint rate, uint startPresale, uint timeOfDeadLine)
-					Admin(msg.sender) WhiteList(moderator) public payable {
+					Admin(msg.sender) WhiteList(moderator) public {
 		require(addressOfTokenUsedAsReward != address(0x0));
 		require(rate > 0);
 		require(startPresale > now);
@@ -57,7 +57,6 @@ contract 	PreCrowdSale is Admin, WhiteList {
 	/*
 	**	Fallback function for raising ether
 	*/ 
-	// need test
 	function () external payable {
 		uint 	amount;
 		uint 	remain;
@@ -92,8 +91,7 @@ contract 	PreCrowdSale is Admin, WhiteList {
 	**	Function for withdrawal ether by a authorized user
 	**	if crowdsale isn't success
 	*/ 
-	/* need test */
-	function    withdrawalMoneyBack() public payable {
+	function    withdrawalMoneyBack() public {
 		uint 	amount;
 
 		assertBool(_crowdSaleClosed, false);
@@ -111,8 +109,7 @@ contract 	PreCrowdSale is Admin, WhiteList {
 	**	Function for withdrawal ether by admin
 	**	if crowdsale is success
 	*/ 
-	// need test
-	function 	withdrawalAdmin() public payable {
+	function 	withdrawalAdmin() public {
 		uint 	amount;
 		assertBool(_crowdSaleClosed, false);
 		assertBool(_crowdSaleSuccess, false);

@@ -8,7 +8,7 @@ interface 	Token {
 	function 	transfer(address _to, uint _value) public returns (bool success);
 }
 
-contract 	PreCrowdSale is Admin, WhiteList {
+contract 	PreSale is Admin, WhiteList {
 
 	using SafeMathSale for uint;
 
@@ -41,7 +41,7 @@ contract 	PreCrowdSale is Admin, WhiteList {
     **   Constructor
     */
 	// "0xa54fbd3339dc1a6082718852072b82dde3403865", "0x627306090abab3a6e1400e9345bc60c78a8bef57", "7000", "10"
-	function 	PreCrowdSale(address addressOfTokenUsedAsReward, address moderator, uint rate, uint startPresale, uint timeOfDeadLine)
+	function 	PreSale(address addressOfTokenUsedAsReward, address moderator, uint rate, uint startPresale, uint timeOfDeadLine)
 					Admin(msg.sender) WhiteList(moderator) public {
 		require(addressOfTokenUsedAsReward != address(0x0));
 		require(rate > 0);

@@ -15,7 +15,7 @@
 Токен использует [SafeMathToken](https://github.com/liderako/Crystals-Love/blob/master/Crystals-Love/Token/SafeMathToken.sol) для безопаноcних вычеслений.
 
 Токен вы можете изучить пройдя по ссылке [Token](https://github.com/liderako/Crystals-Love/blob/master/Crystals-Love/Token/Token.sol)
-Из дополнительного функционала есть
+. Из дополнительного функционала есть
 1. Сжигание токенов
 ```
 1.  Доступно только для адресов которым Админ позволил сжигать токены. (Это будут адреса смарт-контрактов)

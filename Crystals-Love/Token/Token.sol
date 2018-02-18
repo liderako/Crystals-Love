@@ -71,7 +71,7 @@ contract Token is ERC20, Admin {
 	* 	@param uint amount tokens for burn.
 	*/
 	function 	burn( uint amount ) public returns ( bool ) {
-	    require( amount != 0);
+		require( amount != 0);
 		require( _balanceOf[msg.sender] >= amount );
 		require( _burnAddress[msg.sender] == true );
 

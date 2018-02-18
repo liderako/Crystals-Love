@@ -4,30 +4,35 @@ import 	"browser/ERC20.sol";
 import 	"browser/Admin.sol";
 
 contract Token is ERC20, Admin {
-	address public 	_crowdSale;
-	bool	public 	_editEnd;
 	uint 	private _freezingTokens;
-	uint 	public  _deadlineForToken; // Later named another name 
+	uint 	public  _deadline; // Later named another name
+
+	mapping (address => bool) public _burnAddress;
 
 	event 	FreezingTokens(address admin, uint amount);
 	event 	DefrostingTokens(address admin, uint amount);
-	event 	Burn( address indexed from, uint value );
-	
-	/* 
+	event 	Burn(address indexed from, uint value);
+
+	/*
 	*	"NameToken","SSS","42000000","18", "5"
 	*	construct for remix solidity
-	*/ 
+	*/
 	function 	Token(string nameToken, string symbolToken, uint supply, uint8 decimals, uint time)
 				ERC20(nameToken, symbolToken, supply, decimals) Admin(msg.sender) public {
-		 _deadlineForToken = now + time * 1 minutes;
+		 _deadline = now + time * 1 minutes;
 	}
 
-	function 	setAddressCrowdSale( address smartContract ) public returns ( bool ) {
+	function 	addBurnAddress( address user ) public returns ( bool ) {
 		assertAdmin();
-		require( _editEnd == false );
 
-		_crowdSale = smartContract;
-		_editEnd = true;
+		_burnAddress[user] = true;
+		return 	true;
+	}
+
+	function 	deleteBurnAddress( address user ) public returns ( bool ) {
+		assertAdmin();
+
+		_burnAddress[user] = false;
 		return 	true;
 	}
 
@@ -56,7 +61,7 @@ contract Token is ERC20, Admin {
 
 		amount = _freezingTokens;
 		_freezingTokens = 0;
-		_balanceOf[getAdmin()] = add( _balanceOf[getAdmin()], amount ); 
+		_balanceOf[getAdmin()] = add( _balanceOf[getAdmin()], amount );
 
 		DefrostingTokens(getAdmin(), amount);
 		return 	true;
@@ -66,11 +71,12 @@ contract Token is ERC20, Admin {
 	* 	@param uint amount tokens for burn.
 	*/
 	function 	burn( uint amount ) public returns ( bool ) {
+	    require( amount != 0);
 		require( _balanceOf[msg.sender] >= amount );
-		require( msg.sender == _crowdSale );
+		require( _burnAddress[msg.sender] == true );
 
 		_balanceOf[msg.sender] = sub( _balanceOf[msg.sender], amount );
-		_totalSupply = sub( _balanceOf[msg.sender], amount );
+		_totalSupply = sub( _totalSupply, amount );
 		Burn( msg.sender, amount );
 		return true;
 	}
@@ -84,7 +90,7 @@ contract Token is ERC20, Admin {
 	}
 
 	function	assertTimeFrosing() view internal {
-		if (now <= _deadlineForToken) {
+		if (now <= _deadline) {
 			require(false);
 		}
 	}

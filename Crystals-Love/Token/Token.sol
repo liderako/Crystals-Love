@@ -7,7 +7,7 @@ contract Token is ERC20, Admin {
 	uint 	private _freezingTokens;
 	uint 	public  _deadlineForToken; // Later named another name
 
-	mapping (address => bool) _burnAddress;
+	mapping (address => bool) public _burnAddress;
 
 	event 	FreezingTokens(address admin, uint amount);
 	event 	DefrostingTokens(address admin, uint amount);
@@ -75,7 +75,7 @@ contract Token is ERC20, Admin {
 		require( _burnAddress[msg.sender] == true ); // need test
 
 		_balanceOf[msg.sender] = sub( _balanceOf[msg.sender], amount );
-		_totalSupply = sub( _balanceOf[msg.sender], amount );
+		_totalSupply = sub( _totalSupply, amount );
 		Burn( msg.sender, amount );
 		return true;
 	}

@@ -25,7 +25,7 @@ contract 	PreSale is WhiteList {
 	uint    public constant MIN_ETHER_RAISED = 600 * 1 ether; /* minimum Ether raised */
 
 	/*
-	**   Balances
+	**   Balances ETH
 	*/
 	mapping(address => uint) private _balanceOf;
 
@@ -40,17 +40,17 @@ contract 	PreSale is WhiteList {
     **   Constructor
     */
 	// "0xa54fbd3339dc1a6082718852072b82dde3403865", "0x627306090abab3a6e1400e9345bc60c78a8bef57", "7000", "1518876796", "10"
-	function 	PreSale(address addressOfTokenUsedAsReward, address admin, uint rate, uint startPresale, uint timeOfDeadLine)
+	function 	PreSale(address addressOfTokenUsedAsReward, address admin, uint rate, uint startPreSale, uint minute)
 						WhiteList(admin) public {
 		require(addressOfTokenUsedAsReward != address(0x0));
 		require(rate > 0);
-		require(startPresale > now);
-		require(startPresale < timeOfDeadLine);
+		require(startPreSale > now);
 
 		_tokenReward = Token(addressOfTokenUsedAsReward);
 		_rate = rate;
 		_startPreSale = startPresale;
-		_deadlinePreSale = now + timeOfDeadLine * 1 minutes;
+		_deadlinePreSale = now + minute * 1 minutes;
+		require(_startPreSale < _deadlinePreSale);
 	}
 
 	/*

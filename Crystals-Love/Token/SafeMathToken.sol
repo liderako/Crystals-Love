@@ -1,23 +1,16 @@
 pragma solidity ^0.4.18;
 
 contract SafeMathToken {
-	function 	add(uint x, uint y) pure internal returns (uint) {
-		uint 	z;
+	function add( uint a, uint b ) internal pure returns ( uint ) {
+		uint c;
 
-		z = x + y;
-		if (z <= x) {
-			require(false); /* Overflow */
-		}
-		return 	z;
+		c = a + b;
+		assert( c >= a ); /* protected Owerflow */
+		return c;
 	}
 
-	function 	sub(uint x, uint y) pure internal returns (uint) {
-		uint 	z;
-
-		z = x - y;
-		if (z >= x) {
-			require(false); /* Overflow */
-		}
-		return 	z;
-	}
+	function sub( uint a, uint b ) internal pure returns ( uint ) {
+    		assert( b <= a ); /* protected Owerflow */
+    		return a - b;
+  	}
 }

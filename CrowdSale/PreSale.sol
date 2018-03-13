@@ -4,7 +4,7 @@ import 	"browser/SafeMathSale.sol";
 import	"browser/WhiteList.sol";
 
 interface 	Token {
-	function 	transfer(address _to, uint _value) public returns (bool success);
+	function 	transfer( address _to, uint _value ) public returns ( bool success );
 }
 
 contract 	PreSale is WhiteList {
@@ -27,7 +27,7 @@ contract 	PreSale is WhiteList {
 	/*
 	**   Balances ETH
 	*/
-	mapping(address => uint) private _balanceOf;
+	mapping( address => uint ) private 	_balanceOf;
 
 	/*
 	**   Events
@@ -37,20 +37,21 @@ contract 	PreSale is WhiteList {
 	event   GoalReached(uint amountRaised, bool crowdSaleSuccess);
 
 	/*
-    **   Constructor
-    */
+	**   Constructor
+	*/
 	// "0xa54fbd3339dc1a6082718852072b82dde3403865", "0x627306090abab3a6e1400e9345bc60c78a8bef57", "7000", "1518876796", "10"
-	function 	PreSale(address addressOfTokenUsedAsReward, address admin, uint rate, uint startPreSale, uint minute)
-						WhiteList(admin) public {
-		require(addressOfTokenUsedAsReward != address(0x0));
-		require(rate > 0);
-		require(startPreSale > now);
+	function 	PreSale( address addressOfTokenUsedAsReward, address admin, uint rate, uint startPreSale, uint minute )
+						WhiteList( admin ) public {
 
-		_tokenReward = Token(addressOfTokenUsedAsReward);
+		require( addressOfTokenUsedAsReward != address(0x0) );
+		require( rate > 0 );
+		require( startPreSale > now );
+
+		_tokenReward = Token( addressOfTokenUsedAsReward );
 		_rate = rate;
 		_startPreSale = startPresale;
 		_deadlinePreSale = now + minute * 1 minutes;
-		require(_startPreSale < _deadlinePreSale);
+		require( _startPreSale < _deadlinePreSale );
 	}
 
 	/*
@@ -60,29 +61,31 @@ contract 	PreSale is WhiteList {
 		uint 	amount;
 		uint 	remain;
 
-		require(now >= _startPreSale && now <= _deadlinePreSale);   // check start and deadline of presale
-		assertBool(_crowdSaleClosed, true); // check if crowdsale is closed
-		assertUserAuthorized(msg.sender);   // check if user is authorized
+		require( now >= _startPreSale && now <= _deadlinePreSale ); /* check start and deadline of presale */
+		assertBool( _crowdSaleClosed, true ); /* check if crowdsale is closed */
+		assertUserAuthorized( msg.sender );
 
 		amount = msg.value;
-		remain = MIN_ETHER_RAISED.sub(_amountRaised);
-		require(amount <= remain); // check if remain <= _amountRaised
+		assertBalancePayable( amount, msg.sender );
+		remain = MIN_ETHER_RAISED.sub( _amountRaised );
+		require( amount <= remain ); /* check if remain <= _amountRaised */
 
-		_balanceOf[msg.sender] = _balanceOf[msg.sender].add(amount);
-		_amountRaised = _amountRaised.add(amount);
+
+		_balanceOf[msg.sender] = _balanceOf[msg.sender].add( amount );
+		_amountRaised = _amountRaised.add( amount );
 		goalManagement();
-		_tokenReward.transfer(msg.sender, amount.mul(_rate));
-		DepositEther(msg.sender, amount);
+		_tokenReward.transfer( msg.sender, amount.mul( _rate ) );
+		DepositEther( msg.sender, amount );
 	}
 
 	/*
 	**   Function for check goal reaching
 	*/
 	function 	goalManagement() private {
-		if (_amountRaised >= MIN_ETHER_RAISED) { // check current balance
+		if ( _amountRaised >= MIN_ETHER_RAISED ) { // check current balance
 			_crowdSaleClosed = true;
 			_crowdSaleSuccess = true;
-			GoalReached(_amountRaised, _crowdSaleSuccess);
+			GoalReached( _amountRaised, _crowdSaleSuccess );
 		}
 	}
 
@@ -93,15 +96,15 @@ contract 	PreSale is WhiteList {
 	function    withdrawalMoneyBack() public {
 		uint 	amount;
 
-		assertBool(_crowdSaleClosed, false);
-		assertBool(_crowdSaleSuccess, true);
-		assertUserAuthorized(msg.sender);
+		assertBool( _crowdSaleClosed, false );
+		assertBool( _crowdSaleSuccess, true );
+		assertUserAuthorized( msg.sender );
 
 		amount = _balanceOf[msg.sender];
 		_balanceOf[msg.sender] = 0;
-		_amountRaised = _amountRaised.sub(amount);
-		msg.sender.transfer(amount);
-		WithdrawEther(msg.sender, amount);
+		_amountRaised = _amountRaised.sub( amount );
+		msg.sender.transfer( amount );
+		WithdrawEther( msg.sender, amount );
 	}
 
 	/*
@@ -110,31 +113,40 @@ contract 	PreSale is WhiteList {
 	*/
 	function 	withdrawalAdmin() public {
 		uint 	amount;
-		assertBool(_crowdSaleClosed, false);
-		assertBool(_crowdSaleSuccess, false);
+
+		assertBool( _crowdSaleClosed, false );
+		assertBool( _crowdSaleSuccess, false );
 		assertAdmin();
 
 		amount = _amountRaised;
 		_amountRaised = 0;
-		msg.sender.transfer(amount);
-		WithdrawEther(msg.sender, amount);
+		msg.sender.transfer( amount );
+		WithdrawEther( msg.sender, amount );
 	}
 
 	/*
 	**	Function for close ICO if it isn't success
 	*/
 	function    closePreSale() public {
-		require(now >= _deadlinePreSale);	/* check Deadline of presale */
-		assertBool(_crowdSaleClosed, true);	/* check if crowdsale is closed */
-		assertUserAuthorized(msg.sender);
+		require( now >= _deadlinePreSale );	/* check Deadline of presale */
+		assertBool( _crowdSaleClosed, true );	/* check if crowdsale is closed */
+		assertUserAuthorized( msg.sender );
 
 		_crowdSaleClosed = true;
 	}
 
-	function 	assertBool(bool a, bool b) pure private {
-		if (a == b) {
-			require(false);
+	function 	assertBool( bool a, bool b ) pure private {
+		if ( a == b ) {
+			require( false );
 		}
 	}
 
+	function	 assertBalancePayable( uint amountPayable, address user ) pure private {
+		uint 	amount;
+
+		amount = getBalanceAbailabeEthereum( user );
+		if ( amount != amountPayable ) {
+			require( false );
+		}
+	}
 }

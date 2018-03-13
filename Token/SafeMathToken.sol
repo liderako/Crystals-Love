@@ -10,7 +10,7 @@ contract SafeMathToken {
 	}
 
 	function sub( uint a, uint b ) internal pure returns ( uint ) {
-    		assert( b <= a ); /* protected Owerflow */
-    		return a - b;
-  	}
+			assert( b <= a ); /* protected Owerflow */
+			return a - b;
+	}
 }

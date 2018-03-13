@@ -5,8 +5,8 @@ contract Admin {
 	address private _admin;
 
 	function 	Admin( address admin ) public {
-	    if ( admin == address( 0x0 ) )
-	        require( false );
+		if ( admin == address( 0x0 ) )
+			require( false );
 		_admin = admin;
 	}
 

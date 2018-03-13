@@ -14,9 +14,9 @@ library SafeMathSale {
 	}
 
 	function sub( uint a, uint b ) internal pure returns ( uint ) {
-    		assert( b <= a );
-    		return a - b;
-  	}
+			assert( b <= a );
+			return a - b;
+	}
 
 	function add( uint a, uint b ) internal pure returns ( uint ) {
 		uint c;

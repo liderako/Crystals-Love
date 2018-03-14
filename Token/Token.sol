@@ -48,7 +48,7 @@ contract Token is ERC20, Admin {
 		amount = amount * (10 ** uint( _decimals ));
 		_balanceOf[getAdmin()] = sub( _balanceOf[getAdmin()], amount );
 		_freezingTokens = amount;
-		FreezingTokens( getAdmin(), amount );
+		emit FreezingTokens( getAdmin(), amount );
 		return 	true;
 	}
 
@@ -63,7 +63,7 @@ contract Token is ERC20, Admin {
 		_freezingTokens = 0;
 		_balanceOf[getAdmin()] = add( _balanceOf[getAdmin()], amount );
 
-		DefrostingTokens( getAdmin(), amount );
+		emit DefrostingTokens( getAdmin(), amount );
 		return 	true;
 	}
 
@@ -78,7 +78,7 @@ contract Token is ERC20, Admin {
 
 		_balanceOf[msg.sender] = sub( _balanceOf[msg.sender], amount );
 		_totalSupply = sub( _totalSupply, amount );
-		Burn( msg.sender, amount );
+		emit Burn( msg.sender, amount );
 		return true;
 	}
 

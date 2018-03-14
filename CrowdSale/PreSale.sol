@@ -75,7 +75,7 @@ contract 	PreSale is WhiteList {
 		_amountRaised = _amountRaised.add( amount );
 		goalManagement();
 		_tokenReward.transfer( msg.sender, amount.mul( _rate ) );
-		DepositEther( msg.sender, amount );
+		emit DepositEther( msg.sender, amount );
 	}
 
 	/*
@@ -85,7 +85,7 @@ contract 	PreSale is WhiteList {
 		if ( _amountRaised >= MIN_ETHER_RAISED ) { // check current balance
 			_crowdSaleClosed = true;
 			_crowdSaleSuccess = true;
-			GoalReached( _amountRaised, _crowdSaleSuccess );
+			emit GoalReached( _amountRaised, _crowdSaleSuccess );
 		}
 	}
 
@@ -104,7 +104,7 @@ contract 	PreSale is WhiteList {
 		_balanceOf[msg.sender] = 0;
 		_amountRaised = _amountRaised.sub( amount );
 		msg.sender.transfer( amount );
-		WithdrawEther( msg.sender, amount );
+		emit WithdrawEther( msg.sender, amount );
 	}
 
 	/*
@@ -121,7 +121,7 @@ contract 	PreSale is WhiteList {
 		amount = _amountRaised;
 		_amountRaised = 0;
 		msg.sender.transfer( amount );
-		WithdrawEther( msg.sender, amount );
+		emit WithdrawEther( msg.sender, amount );
 	}
 
 	/*

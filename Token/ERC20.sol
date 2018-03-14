@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.21;
 
 import "browser/SafeMathToken.sol";
 import "browser/IERC20.sol";

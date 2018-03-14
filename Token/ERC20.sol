@@ -4,13 +4,13 @@ import "browser/SafeMathToken.sol";
 import "browser/IERC20.sol";
 
 contract 	ERC20 is SafeMathToken, IERC20 {
-	uint	private 	_totalSupply;
-	string 	private		_name;
-	string	private		_symbol;
-	uint8	private		_decimals;
+	uint	internal 	_totalSupply;
+	string 	internal	_name;
+	string	internal	_symbol;
+	uint8	internal	_decimals;
 
-	mapping ( address => uint )							private _balanceOf;
-	mapping ( address => mapping ( address => uint ) )	private _allowance;
+	mapping ( address => uint )							internal _balanceOf;
+	mapping ( address => mapping ( address => uint ) )	internal _allowance;
 
 	function 	ERC20( string nameToken, string symbolToken, uint supply, uint8 decimals ) public {
 		uint 	balance;

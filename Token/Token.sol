@@ -19,7 +19,8 @@ contract Token is ERC20, Admin {
 	*/
 	function 	Token( string nameToken, string symbolToken, uint supply, uint8 decimals, uint time )
 				ERC20( nameToken, symbolToken, supply, decimals ) Admin( msg.sender ) public {
-		_deadline = now + time * 1 minutes;
+		//_deadline = now + time * 1 years; /* for deploy */
+		_deadline = now + time * 1 minutes; /* for test */
 	}
 
 	/*

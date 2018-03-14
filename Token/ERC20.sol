@@ -9,8 +9,8 @@ contract 	ERC20 is SafeMathToken, IERC20 {
 	string	private		_symbol;
 	uint8	private		_decimals;
 
-	mapping ( address => uint )							public _balanceOf;
-	mapping ( address => mapping ( address => uint ) )	public _allowance;
+	mapping ( address => uint )							private _balanceOf;
+	mapping ( address => mapping ( address => uint ) )	private _allowance;
 
 	function 	ERC20( string nameToken, string symbolToken, uint supply, uint8 decimals ) public {
 		uint 	balance;

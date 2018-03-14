@@ -5,12 +5,12 @@ contract SafeMathToken {
 		uint c;
 
 		c = a + b;
-		assert( c >= a ); /* protected Owerflow */
+		assert( c >= a ); /* defence Owerflow */
 		return c;
 	}
 
 	function sub( uint a, uint b ) internal pure returns ( uint ) {
-			assert( b <= a ); /* protected Owerflow */
+			assert( b <= a ); /* defence Owerflow */
 			return a - b;
 	}
 }

@@ -22,27 +22,32 @@ contract Token is ERC20, Admin {
 		_deadline = now + time * 1 minutes;
 	}
 
-	function 	addBurnAddress( address user ) public returns ( bool ) {
+	/*
+ 	** The function is available only admin.
+	** Function sets value in mapping burnAddress.
+	** If msg.sender != admin, then revert transaction.
+	** If @param true, then user can use function Burn.
+	** If @param false, then user can't use function Burn.
+	*/
+	function	changeStatusBurnAddress( address user, bool status ) public {
 		assertAdmin();
 
-		_burnAddress[user] = true;
-		return 	true;
+		_burnAddress[user] = status;
 	}
 
-	function 	deleteBurnAddress( address user ) public returns ( bool ) {
-		assertAdmin();
-
-		_burnAddress[user] = false;
-		return 	true;
-	}
-
+	/*
+	** The function is available only admin.
+	** Function freezing tokens.
+	** if msg.sender != admin, then revert transaction.
+	** if amount == 0 then revert transaction.
+	*/
 	function 	freezingTokens( uint amount )  public returns ( bool ) {
 		assertAdmin();
 
-		if ( _balanceOf[getAdmin()] < amount || amount == 0 ) {
+		if ( _balanceOf[getAdmin()] < amount || amount == 0 ) { /* defence from the creation of new tokens and empty transaction */
 			require( false );
 		}
-		if ( _freezingTokens > 0 ) {
+		if ( _freezingTokens > 0 ) { /* defence double freezing */
 			require( false );
 		}
 		amount = amount * (10 ** uint( _decimals ));

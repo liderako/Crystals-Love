@@ -4,10 +4,10 @@ import "browser/SafeMathToken.sol";
 import "browser/IERC20.sol";
 
 contract 	ERC20 is SafeMathToken, IERC20 {
-	uint	public _totalSupply;
-	string 	public	_name;
-	string	public	_symbol;
-	uint8	public	_decimals;
+	uint	private 	_totalSupply;
+	string 	private		_name;
+	string	private		_symbol;
+	uint8	private		_decimals;
 
 	mapping ( address => uint )							public _balanceOf;
 	mapping ( address => mapping ( address => uint ) )	public _allowance;
@@ -62,5 +62,17 @@ contract 	ERC20 is SafeMathToken, IERC20 {
 
 		emit Approval( msg.sender, spender, amount );
 		return true;
+	}
+
+	function 	name() external constant returns ( string ) {
+		return _name;
+	}
+
+	function 	symbol() external constant returns ( string ) {
+		return 	_symbol;
+	}
+
+	function 	decimals() external constant returns ( uint8 ) {
+		return _decimals;
 	}
 }

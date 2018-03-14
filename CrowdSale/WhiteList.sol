@@ -39,7 +39,7 @@ contract 	WhiteList is Admin {
 	*/
 	function	changeStatusModerator( address user, bool status ) public {
 		assertAdmin();
-		assertNull( moderator );
+		assertNULL( user );
 
 		_moderator[user] = status;
 	}

@@ -4,7 +4,7 @@ import 	"browser/SafeMathSale.sol";
 import	"browser/WhiteList.sol";
 
 interface 	Token {
-	function 	transfer( address _to, uint _value ) public returns ( bool success );
+	function 	transfer( address _to, uint _value ) external returns ( bool success );
 }
 
 contract 	PreSale is WhiteList {
@@ -49,7 +49,7 @@ contract 	PreSale is WhiteList {
 
 		_tokenReward = Token( addressOfTokenUsedAsReward );
 		_rate = rate;
-		_startPreSale = startPresale;
+		_startPreSale = startPreSale;
 		_deadlinePreSale = now + minute * 1 minutes;
 		require( _startPreSale < _deadlinePreSale );
 	}
@@ -141,7 +141,7 @@ contract 	PreSale is WhiteList {
 		}
 	}
 
-	function	 assertBalancePayable( uint amountPayable, address user ) pure private {
+	function	 assertBalancePayable( uint amountPayable, address user ) view private {
 		uint 	amount;
 
 		amount = getBalanceAbailabeEthereum( user );

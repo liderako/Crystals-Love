@@ -1,14 +1,16 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.21;
 
 import 	"browser/Admin.sol";
 
 contract 	WhiteList is Admin {
 
-	mapping( address => bool ) public		_moderator;
-	mapping( address => bool ) internal	_listAuthorizedUser;
+	mapping( address => bool ) internal		_moderator;
+	mapping( address => bool ) internal		_listAuthorizedUser;
+	mapping( address => uint ) internal		_balanceAvailabeEth;
 
 	/*
-	** If moderator == 0x0, then revert moderator.
+	** Construct.
+	** If @param admin == 0x0, then revert transaction.
 	*/
 	function 	WhiteList( address admin ) public Admin( admin ){
 		assertNULL( admin );
@@ -19,37 +21,39 @@ contract 	WhiteList is Admin {
 	** The function is available only moderator.
 	** If user == 0x0, then revert transaction.
 	**/
-	function 	setAuthorizeUser( address user ) public {
+	function 	setAuthorizeUser( address user, uint amountEth ) public {
 		assertNULL( user );
 		assertModerator();
 
 		_listAuthorizedUser[user] = true;
+		_balanceAvailabeEth[user] = amountEth;
 	}
+
 	/*
-	** Add the moderator
-	** The function is available only admin.
+ 	** The function is available only admin.
+	** Function sets value in mapping moderator.
+	** If msg.sender != admin, then revert transaction.
+	** If @param true, then user moderator.
+	** If @param false, then user no moderator.
 	** If user = 0x0, then revert transaction.
 	*/
-	function	setModerator( address moderator ) public {
+	function	changeStatusModerator( address user, bool status ) public {
 		assertAdmin();
-		assertNULL( moderator );
+		assertNULL( user );
 
-		_moderator[moderator] = true;
-	}
-	/*
-	** This function deleting moderator.
-	** Function is available only admin.
-	** If user = 0x0, then revert transaction.
-	*/
-	function	deleteModerator( address moderator ) public {
-		assertAdmin();
-		assertNULL( moderator );
-
-		_moderator[moderator] = false;
+		_moderator[user] = status;
 	}
 
-	function 	getAuthorizeUser( address user ) public constant returns( bool ) {
+	function 	getAuthorizeUser( address user ) public constant returns ( bool ) {
 		return 	_listAuthorizedUser[user];
+	}
+
+	function 	getModerator( address user ) public constant returns ( bool ) {
+		return 	_moderator[user];
+	}
+
+	function 	getBalanceAbailabeEthereum( address user ) public constant returns ( uint ) {
+		return 	_balanceAvailabeEth[user];
 	}
 
 	function 	assertModerator() view internal {
@@ -63,7 +67,7 @@ contract 	WhiteList is Admin {
 	}
 
 	function    assertNULL( address user ) pure internal {
-	    if ( user == address( 0x0 ))
-	        require( false );
+		if ( user == address( 0x0 ) )
+			 require( false );
 	}
 }

@@ -1,12 +1,12 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.21;
 
 contract Admin {
 
 	address private _admin;
 
 	function 	Admin( address admin ) public {
-	    if ( admin == address( 0x0 ) )
-	        require( false );
+		if ( admin == address( 0x0 ) )
+			require( false );
 		_admin = admin;
 	}
 

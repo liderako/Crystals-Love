@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.21;
 
 library SafeMathSale {
 
@@ -14,9 +14,9 @@ library SafeMathSale {
 	}
 
 	function sub( uint a, uint b ) internal pure returns ( uint ) {
-    		assert( b <= a );
-    		return a - b;
-  	}
+			assert( b <= a );
+			return a - b;
+	}
 
 	function add( uint a, uint b ) internal pure returns ( uint ) {
 		uint c;

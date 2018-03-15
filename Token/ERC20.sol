@@ -1,16 +1,16 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.21;
 
 import "browser/SafeMathToken.sol";
 import "browser/IERC20.sol";
 
 contract 	ERC20 is SafeMathToken, IERC20 {
-	uint	public _totalSupply;
-	string 	public	_name;
-	string	public	_symbol;
-	uint8	public	_decimals;
+	uint	internal 	_totalSupply;
+	string 	internal	_name;
+	string	internal	_symbol;
+	uint8	internal	_decimals;
 
-	mapping ( address => uint )							public _balanceOf;
-	mapping ( address => mapping ( address => uint ) )	public _allowance;
+	mapping ( address => uint )							internal _balanceOf;
+	mapping ( address => mapping ( address => uint ) )	internal _allowance;
 
 	function 	ERC20( string nameToken, string symbolToken, uint supply, uint8 decimals ) public {
 		uint 	balance;
@@ -23,29 +23,29 @@ contract 	ERC20 is SafeMathToken, IERC20 {
 		_decimals = decimals;
 	}
 
-	function 	totalSupply() public constant returns ( uint ) {
+	function 	totalSupply() external constant returns ( uint ) {
 		return _totalSupply;
 	}
 
-	function 	balanceOf( address user ) public constant returns ( uint ) {
+	function 	balanceOf( address user ) external constant returns ( uint ) {
 		return _balanceOf[user];
 	}
 
-	function 	allowance( address owner, address spender ) public constant returns ( uint ) {
+	function 	allowance( address owner, address spender ) external constant returns ( uint ) {
 		return _allowance[owner][spender];
 	}
 
-	function 	transfer( address to, uint amount ) public returns ( bool ) {
+	function 	transfer( address to, uint amount ) external returns ( bool ) {
 		require(_balanceOf[msg.sender] >= amount);
 
 		_balanceOf[msg.sender] = sub( _balanceOf[msg.sender], amount );
 		_balanceOf[to] = add( _balanceOf[to], amount );
 
-		Transfer( msg.sender, to, amount );
+		emit Transfer( msg.sender, to, amount );
 		return true;
 	}
 
-	function 	transferFrom( address from, address to, uint amount ) public returns ( bool ) {
+	function 	transferFrom( address from, address to, uint amount ) external returns ( bool ) {
 		require( _balanceOf[from] >= amount );
 		require( _allowance[from][msg.sender] >= amount );
 
@@ -53,14 +53,26 @@ contract 	ERC20 is SafeMathToken, IERC20 {
 		_balanceOf[from] = sub( _balanceOf[from], amount );
 		_balanceOf[to] = add( _balanceOf[to], amount );
 
-		Transfer( from, to, amount );
+		emit Transfer( from, to, amount );
 		return true;
 	}
 
-	function 	approve( address spender, uint amount ) public returns ( bool ) {
+	function 	approve( address spender, uint amount ) external returns ( bool ) {
 		_allowance[msg.sender][spender] = amount;
 
-		Approval( msg.sender, spender, amount );
+		emit Approval( msg.sender, spender, amount );
 		return true;
+	}
+
+	function 	name() external constant returns ( string ) {
+		return _name;
+	}
+
+	function 	symbol() external constant returns ( string ) {
+		return 	_symbol;
+	}
+
+	function 	decimals() external constant returns ( uint8 ) {
+		return _decimals;
 	}
 }

@@ -51,7 +51,7 @@ contract Token is ERC20, Admin {
 		if ( _freezingTokens > 0 ) { /* defence double freezing */
 			require( false );
 		}
-		amount = amount * (10 ** uint( _decimals ));
+		amount = amount * ( 10 ** uint( _decimals ) );
 		_balanceOf[getAdmin()] = sub( _balanceOf[getAdmin()], amount );
 		_freezingTokens = amount;
 		emit FreezingTokens( getAdmin(), amount );

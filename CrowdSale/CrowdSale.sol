@@ -7,17 +7,17 @@ interface 	Token {
 	function 	transfer( address _to, uint _value ) external returns ( bool success );
 }
 
-contract 	PreSale is WhiteList {
+contract 	CrowdSale is WhiteList {
 
 	using SafeMathSale for uint;
 
 	Token 	public 	_tokenReward;
 	uint 	public	_rate;
 	uint 	public	_amountRaised;
-	bool 	public 	_crowdSaleClosed;
-	bool 	public 	_crowdSaleSuccess;
-	uint	public	_startPreSale;
-	uint    public  _deadlinePreSale;
+	bool 	public 	_saleClosed;
+	bool 	public 	_saleSuccess;
+	uint	public	_startSale;
+	uint    public  _deadlineSale;
 
 	/*
 	**   Constants
@@ -34,24 +34,24 @@ contract 	PreSale is WhiteList {
 	*/
 	event 	DepositEther(address owner, uint amount);
 	event 	WithdrawEther(address owner, uint amount);
-	event   GoalReached(uint amountRaised, bool crowdSaleSuccess);
+	event   GoalReached(uint amountRaised, bool saleSuccess);
 
 	/*
 	**   Constructor
 	*/
 	// "0xa54fbd3339dc1a6082718852072b82dde3403865", "0x627306090abab3a6e1400e9345bc60c78a8bef57", "7000", "1518876796", "10"
-	function 	PreSale( address addressOfTokenUsedAsReward, address admin, uint rate, uint startPreSale, uint minute )
+	function 	CrowdSale( address addressOfTokenUsedAsReward, address admin, uint rate, uint startSale, uint minute )
 						WhiteList( admin ) public {
 
 		require( addressOfTokenUsedAsReward != address(0x0) );
 		require( rate > 0 );
-		require( startPreSale > now );
+		require( startSale > now );
 
 		_tokenReward = Token( addressOfTokenUsedAsReward );
 		_rate = rate;
-		_startPreSale = startPreSale;
-		_deadlinePreSale = now + minute * 1 minutes;
-		require( _startPreSale < _deadlinePreSale );
+		_startSale = startSale;
+		_deadlineSale = now + minute * 1 minutes;
+		require( _startSale < _deadlineSale );
 	}
 
 	/*
@@ -61,8 +61,8 @@ contract 	PreSale is WhiteList {
 		uint 	amount;
 		uint 	remain;
 
-		require( now >= _startPreSale && now <= _deadlinePreSale ); /* check start and deadline of presale */
-		assertBool( _crowdSaleClosed, true ); /* check if crowdsale is closed */
+		require( now >= _startSale && now <= _deadlineSale ); /* check start and deadline of presale */
+		assertBool( _saleClosed, true ); /* check if crowdsale is closed */
 		assertUserAuthorized( msg.sender );
 
 		amount = msg.value;
@@ -83,9 +83,9 @@ contract 	PreSale is WhiteList {
 	*/
 	function 	goalManagement() private {
 		if ( _amountRaised >= MIN_ETHER_RAISED ) { // check current balance
-			_crowdSaleClosed = true;
-			_crowdSaleSuccess = true;
-			emit GoalReached( _amountRaised, _crowdSaleSuccess );
+			_saleClosed = true;
+			_saleSuccess = true;
+			emit GoalReached( _amountRaised, _saleSuccess );
 		}
 	}
 
@@ -96,8 +96,8 @@ contract 	PreSale is WhiteList {
 	function    withdrawalMoneyBack() public {
 		uint 	amount;
 
-		assertBool( _crowdSaleClosed, false );
-		assertBool( _crowdSaleSuccess, true );
+		assertBool( _saleClosed, false );
+		assertBool( _saleSuccess, true );
 		assertUserAuthorized( msg.sender );
 
 		amount = _balanceOf[msg.sender];
@@ -114,8 +114,8 @@ contract 	PreSale is WhiteList {
 	function 	withdrawalAdmin() public {
 		uint 	amount;
 
-		assertBool( _crowdSaleClosed, false );
-		assertBool( _crowdSaleSuccess, false );
+		assertBool( _saleClosed, false );
+		assertBool( _saleSuccess, false );
 		assertAdmin();
 
 		amount = _amountRaised;
@@ -127,12 +127,12 @@ contract 	PreSale is WhiteList {
 	/*
 	**	Function for close ICO if it isn't success
 	*/
-	function    closePreSale() public {
-		require( now >= _deadlinePreSale );	/* check Deadline of presale */
-		assertBool( _crowdSaleClosed, true );	/* check if crowdsale is closed */
+	function    closeSale() public {
+		require( now >= _deadlineSale );	/* check Deadline of presale */
+		assertBool( _saleClosed, true );	/* check if crowdsale is closed */
 		assertUserAuthorized( msg.sender );
 
-		_crowdSaleClosed = true;
+		_saleClosed = true;
 	}
 
 	function 	assertBool( bool a, bool b ) pure private {

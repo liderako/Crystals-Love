@@ -14,7 +14,7 @@ contract Token is ERC20, Admin {
 	event 	Burn( address indexed from, uint value );
 
 	/*
-	*	"NameToken","SSS","42000000","18", "5"
+	*	"CRYSTALS","CRS","192000000","18", "5"
 	*	construct for remix solidity
 	*/
 	function 	Token( string nameToken, string symbolToken, uint supply, uint8 decimals, uint time )

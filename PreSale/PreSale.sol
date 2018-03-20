@@ -49,7 +49,7 @@ contract 	PreSale is WhiteList {
 		_tokenReward = Token( addressOfTokenUsedAsReward );
 		_rate = rate;
 		_startPreSale = now + startPreSale * 1 minutes;
-		_deadlinePreSale = now + (minute + _startPreSale) * 1 minutes;
+		_deadlinePreSale = now + (minute + startPreSale) * 1 minutes;
 		require( _startPreSale < _deadlinePreSale );
 	}
 

@@ -39,18 +39,17 @@ contract 	PreSale is WhiteList {
 	/*
 	**   Constructor
 	*/
-	// "0xa54fbd3339dc1a6082718852072b82dde3403865", "0x627306090abab3a6e1400e9345bc60c78a8bef57", "7000", "1518876796", "10"
+	// "0x6ee64d35aa096dd99f93e1ad61b2c681f67eeb09", "0x9257a9687fb222c8ec849eeda38144f328e80834", "7000", "10", "10"
 	function 	PreSale( address addressOfTokenUsedAsReward, address admin, uint rate, uint startPreSale, uint minute )
 						WhiteList( admin ) public {
 
 		require( addressOfTokenUsedAsReward != address(0x0) );
 		require( rate > 0 );
-		require( startPreSale > now );
 
 		_tokenReward = Token( addressOfTokenUsedAsReward );
 		_rate = rate;
-		_startPreSale = startPreSale;
-		_deadlinePreSale = now + minute * 1 minutes;
+		_startPreSale = now + startPreSale * 1 minutes;
+		_deadlinePreSale = now + (minute + _startPreSale) * 1 minutes;
 		require( _startPreSale < _deadlinePreSale );
 	}
 

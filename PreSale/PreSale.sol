@@ -67,7 +67,7 @@ contract 	PreSale is WhiteList {
 		amount = msg.value;
 		assertBalancePayable( amount, msg.sender ); // нужно добавить обнуление доступного доната
 		remain = MIN_ETHER_RAISED.sub( _amountRaised );
-		require( amount <= remain ); /* check if remain <= _amountRaised */
+		require( amount <= remain );
 
 
 		_balanceOf[msg.sender] = _balanceOf[msg.sender].add( amount );

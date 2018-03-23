@@ -5,7 +5,7 @@ import 	"browser/Admin.sol";
 
 contract Token is ERC20, Admin {
 	uint 	private _freezingTokens;
-	uint 	public  _deadline; // Later named another name
+	uint 	public  _deadLineForFreezing;
 
 	mapping ( address => bool ) public _burnAddress;
 
@@ -19,8 +19,8 @@ contract Token is ERC20, Admin {
 	*/
 	function 	Token( string nameToken, string symbolToken, uint supply, uint8 decimals, uint time )
 				ERC20( nameToken, symbolToken, supply, decimals ) Admin( msg.sender ) public {
-		//_deadline = now + time * 1 years; /* for deploy */
-		_deadline = now + time * 1 minutes; /* for test */
+		//_deadLineForFreezing = now + time * 1 years; /* for deploy */
+		_deadLineForFreezing = now + time * 1 minutes; /* for test */
 	}
 
 	/*
@@ -97,7 +97,7 @@ contract Token is ERC20, Admin {
 	}
 
 	function	assertTimeFrosing() view internal {
-		if ( now <= _deadline ) {
+		if ( now <= _deadLineForFreezing ) {
 			require( false );
 		}
 	}

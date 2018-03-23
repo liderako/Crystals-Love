@@ -32,9 +32,9 @@ contract 	PreSale is WhiteList {
 	/*
 	**   Events
 	*/
-	event 	DepositEther(address owner, uint amount);
-	event 	WithdrawEther(address owner, uint amount);
-	event   GoalReached(uint amountRaised, bool crowdSaleSuccess);
+	event 	DepositEther( address owner, uint amount );
+	event 	WithdrawEther( address owner, uint amount );
+	event   GoalReached( uint amountRaised, bool crowdSaleSuccess );
 
 	/*
 	**   Constructor

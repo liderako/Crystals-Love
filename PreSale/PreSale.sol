@@ -65,7 +65,7 @@ contract 	PreSale is WhiteList {
 		assertUserAuthorized( msg.sender );
 
 		amount = msg.value;
-		assertBalancePayable( amount, msg.sender ); // нужно добавить обнуление доступного доната
+		changedAbailabeBalancesUser( amount, msg.sender );
 		remain = MIN_ETHER_RAISED.sub( _amountRaised );
 		require( amount <= remain );
 
@@ -133,18 +133,19 @@ contract 	PreSale is WhiteList {
 
 		_crowdSaleClosed = true;
 	}
-
-	function 	assertBool( bool a, bool b ) pure private {
-		if ( a == b ) {
-			require( false );
-		}
-	}
-
-	function	 assertBalancePayable( uint amountPayable, address user ) view private {
+	
+	function	 changedAbailabeBalancesUser( uint amountPayable, address user ) private {
 		uint 	amount;
 
 		amount = getBalanceAbailabeEthereum( user );
 		if ( amount != amountPayable ) {
+			require( false );
+		}
+		_balanceAvailabeEth[user] = 0;
+	}
+	
+	function 	assertBool( bool a, bool b ) pure private {
+		if ( a == b ) {
 			require( false );
 		}
 	}

@@ -34,6 +34,7 @@ contract 	CrowdSale is WhiteList {
 	**   Events
 	*/
 	event 	DepositEther(address owner, uint amount);
+	event 	TransferToken(address user, uint amount);
 	event 	WithdrawEther(address owner, uint amount);
 	event   GoalReached(uint amountRaised, bool saleSuccess);
 
@@ -69,15 +70,18 @@ contract 	CrowdSale is WhiteList {
 		emit DepositEther(msg.sender, amount);
 	}
 
-	function 	sendToken(address user) public {
+	function 	transferToken(address user) public {
 		assertModerator();
+		assertNull(user);
+		require (balanceDepositEth[user] != 0);
 
-		require (msg.value > 0);
-		
-		_balanceOf[msg.sender] = _balanceOf[msg.sender].add(amount);
-		//_amountRaised = _amountRaised.add(amount);
-		//goalManagement();
-		//_tokenReward.transfer(msg.sender, amount.mul(_rate));
+		uint amount = balanceDepositEth[user];
+		_balanceOf[user] = _balanceOf[user].add(amount);
+		_amountRaised = _amountRaised.add(amount);
+		balanceDepositEth[user] = 0;
+		goalManagement();
+		_tokenReward.transfer(user, amount.mul(_rate));
+		emit TransferToken()
 	}
 	
 	/*

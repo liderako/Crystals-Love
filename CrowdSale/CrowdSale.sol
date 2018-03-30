@@ -7,7 +7,7 @@ interface 	Token {
 	function 	transfer(address _to, uint _value) external returns (bool success);
 }
 
-contract 	CrowdSale is WhiteList {
+contract 	CrowdSale is AdminPanel {
 
 	using SafeMathSale for uint;
 
@@ -38,7 +38,7 @@ contract 	CrowdSale is WhiteList {
 	event 	WithdrawEther(address owner, uint amount);
 	event   GoalReached(uint amountRaised, bool saleSuccess);
 
-	function 	CrowdSale() WhiteList(msg.sender) public {
+	function 	CrowdSale() AdminPanel(msg.sender) public {
 		uint startSale = 10;
 		uint endSale = 10;
 
@@ -52,38 +52,35 @@ contract 	CrowdSale is WhiteList {
 	*/
 	function () external payable {
 		uint 	amount;
-		uint 	remain;
-
 
 		amount = msg.value;
+		require (getBalanceDepositEth(msg.sender) == 0);
 		require(now >= _startSale && now <= _deadLineSale); /* check start and deadline of presale */
 		assertNotBool(_saleClosed, true); /* check if crowdsale is closed */
-		require (_balanceDepositEth[msg.sender] == 0);
-
-		remain = MIN_ETHER_RAISED.sub(_amountRaised);
-		require(amount <= remain);
-		_balanceDepositEth[msg.sender] = amount;
-		// _balanceOf[msg.sender] = _balanceOf[msg.sender].add(amount);
-		// _amountRaised = _amountRaised.add(amount);
-		// goalManagement();
-		// _tokenReward.transfer(msg.sender, amount.mul(_rate));
+		assertRemain(amount);
+		setBalanceDepositEth(msg.sender, amount);
+		setTimeBeforeMoneyBack(msg.sender, 3)
 		emit DepositEther(msg.sender, amount);
 	}
 
-	function 	transferToken(address user) public {
+	function 	sendToken(address user) public {
+		uint 	amount;
+
+		amount = getBalanceDepositEth(user);
+
 		assertModerator();
 		assertNull(user);
-		require (balanceDepositEth[user] != 0);
+		assertRemain(amount);
+		require (amount > 0);
 
-		uint amount = balanceDepositEth[user];
-		_balanceOf[user] = _balanceOf[user].add(amount);
-		_amountRaised = _amountRaised.add(amount);
-		balanceDepositEth[user] = 0;
-		goalManagement();
+		_balanceOf[user] = _balanceOf[user].add(amount); // add for eth donates
+		_amountRaised = _amountRaised.add(amount); // add for all sum
+		setBalanceDepositEth() = 0;
+		goalManagement(); // check for last payable
 		_tokenReward.transfer(user, amount.mul(_rate));
-		emit TransferToken()
+		emit SendToken()
 	}
-	
+
 	/*
 	**   Function for check goal reaching
 	*/
@@ -94,17 +91,33 @@ contract 	CrowdSale is WhiteList {
 			emit GoalReached(_amountRaised, _saleSuccess);
 		}
 	}
-
+	
 	/*
-	**	Function for withdrawal ether by a authorized user
-	**	if crowdsale isn't success
+	**	Функция для вывода денег для тех пользователей которым было отказано в доступе,
+	** 	или не был подвержден перевод токенов в течении трех дней.
+	**	Вывод денег происходит из маппинга _balanceDepositEth;
+	*/
+	function 	withdrawEth() public {
+		uint 	amount;
+
+		amount = getBalanceDepositEth(msg.sender);
+		setBalanceDepositEth(msg.sender, 0);
+		require(amount != 0);
+		require(now >= getTimeBeforeMoneyBack(msg.sender) || );
+
+		msg.sender.transfer(amount);
+		emit WithdrawEther(msg.sender, amount);
+	}
+	
+	/*
+	** Функция для вывода денег если исо не успешное
+	** выводятся средства с мапинга balanceOF
 	*/
 	function    withdrawalMoneyBack() public {
 		uint 	amount;
 
 		assertNotBool(_saleClosed, false);
 		assertNotBool(_saleSuccess, true);
-		// assertUserAuthorized(msg.sender);
 
 		amount = _balanceOf[msg.sender];
 		_balanceOf[msg.sender] = 0;
@@ -136,7 +149,6 @@ contract 	CrowdSale is WhiteList {
 	function    closeSale() public {
 		require(now >= _deadLineSale);	/* check Deadline of presale */
 		assertNotBool(_saleClosed, true);	/* check if crowdsale is closed */
-	//	assertUserAuthorized(msg.sender);
 		_saleClosed = true;
 	}
 
@@ -146,12 +158,10 @@ contract 	CrowdSale is WhiteList {
 		}
 	}
 
-	// function	 assertBalancePayable( uint amountPayable, address user ) view private {
-	// 	uint 	amount;
+	function 	assertRemain(uint amount) pure private {
+		uint 	remain;
 
-	// 	amount = getBalanceAbailabeEthereum( user );
-	// 	if ( amount != amountPayable ) {
-	// 		require( false );
-	// 	}
-	// }
+		remain = MIN_ETHER_RAISED.sub(_amountRaised);
+		require(amount <= remain);
+	}
 }

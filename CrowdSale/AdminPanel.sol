@@ -5,8 +5,8 @@ import 	"./Admin.sol";
 contract 	AdminPanel is Admin {
 
 	mapping(address => bool) internal		_moderator;
-	mapping(address => uint) internal		_balanceDepositEth;
-	mapping(address => uint) internal		_timeBeforeMoneyBack;
+	mapping(address => uint) internal		_balanceDepositEth; // баланс эфира который был заведен на смарт-контракт но не получен взамен токены
+	mapping(address => uint) internal		_timeBeforeMoneyBack; // время до возможности вернуть свой эфир
 
 	/*
 	** Construct.
@@ -50,8 +50,8 @@ contract 	AdminPanel is Admin {
 
 	function 	setTimeBeforeMoneyBack(address user, uint amountTime) internal {
 		require(amount != 0);
-		// _timeBeforeMoneyBack[user] = now + amountTime * 1 day;
-		_timeBeforeMoneyBack[user] = now + amountTime * 1 minutes;
+		// _timeBeforeMoneyBack[user] = now + amountTime * 1 day; // for deploy
+		_timeBeforeMoneyBack[user] = now + amountTime * 1 minutes;// for testing 
 	}
 
 	function 	assertModerator() view internal {

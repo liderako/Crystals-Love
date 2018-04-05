@@ -80,15 +80,37 @@ contract Moderators is Admin {
 }
 
 contract AdminPanel is Moderators, Admin {
-	mapping(uint => address) private _executor;
-// добавить адрес смарт-контракта токена
-	function 	AdminPanel(address admin) public Admin(admin) { }
 
+	struct Strongbox{
+		uint 	id;
+		address user;
+		uint 	amount;		
+	}
+	
+	mapping(uint => address) 	private _executor;
+	mapping(address => uint) 	private _balanceOf;
+	mapping(bytes32 => Strongbox) private _strongboxList;
+	
+	address 					private	_addressTokenSmartContract;
+	
+	function 	AdminPanel(address admin, address token) public Admin(admin) {
+		require(token != (0x0));
+		_addressTokenSmartContract = token;
+	}
+
+	function 	getAddressTokenSmartContract() public constant returns (address) {
+		returns _addressTokenSmartContract;
+	}
+
+	function 	balanceOf(address user) public constant returns (address) {
+		returns _balanceOf[user];
+	}
+
+	/* Функции для работы с исполнителем */
 	function 	getExecutor(uint id) public constant returns (address) {
 		assertAdms();
 		returns _executor[id];
 	}
-	
 
 	function 	setExecutor(uint id, address user) public returns (bool) {
 		assertAdms(msg.sender);
@@ -103,66 +125,71 @@ contract AdminPanel is Moderators, Admin {
 		_executor[id] = 0x0;
 		return true;
 	}
+
+	/* Функции для работы со сейфом */
+
+
+	/* Пока все функции публично открыти и любой может по хешу узнать что-то кроме адреса исполнителя*/
+	// можно ограничить только для администраторов
+	// для исполнителя и для юзера который создал этот конверт
+	function 	myFunction() returns(bool res) internal {
+		
+	}
+	
+	function 	getId(bytes32 hash) public constant returns (uint) {
+		return _strongboxList[hash].id;
+	}
+	function 	getAmount(bytes32 hash) public constant returns (uint) {
+		return _strongboxList[hash].amount;
+	}
+	function 	getUser(bytes32 hash) public constant returns (uint) {
+		return _strongboxList[hash].user;
+	}
 }
 
 contract Crystals is SafeMath, AdminPanel {
-	mapping(address => mapping(address => uint)) public _tokens;
 
-	function 	Crystals() public AdminPanel(msg.sender) {}
+	function 	Crystals(address token) public AdminPanel(msg.sender, token) {}
 	
 
-	// депозит под ERC20 под наш ERC827 возможно можно другое прописать
-	// нам в принципе не нужен адрес токена
-	function 	depositTokensInWallet(address token, uint amount) public {
-		assertToken(token);
-		assertQuantity(amount);
-	// сделать баланс отдельно
-	// изменить на один токен системы
-	//	_tokens[token][msg.sender] = safeAdd(_tokens[token][msg.sender], amount);
-		if (Token(token).transferFrom(msg.sender, this, amount) == false) {
+	// депозит под ERC20, под наш ERC827 возможно есть более лучшее решение
+	/* Функция для того чтобы завести деньги на личный баланс в смарт-контракте*/
+	function 	depositTokensInWallet(uint amount) public {
+		require (amount != 0);
+		_balanceOf[msg.sender] = safeAdd(balanceOf[msg.sender], amount);
+		if (Token(getAddressTokenSmartContract()).transferFrom(msg.sender, this, amount) == false) {
 			revert();
 		}
 	}
-	// завести деньги в личный баланс
-	function 	withdrawTokensFromWallet(address token, uint amount) public {
-		assertToken(token);
-		assertQuantity(amount);
-
-		// изменить на один токен системы
-		//	_tokens[token][msg.sender] = safeSub(_tokens[token][msg.sender], amount);
-		if (Token(token).transfer(msg.sender, amount) == false) {
+	/* Функция для того чтобы вывести деньги с личного баланса обратно на адрес msg.sender*/
+	function 	withdrawTokensFromWallet(uint amount) public {
+		require (amount != 0);
+		_balanceOf[msg.sender] = safeSub(balanceOf[msg.sender], amount);
+		if (Token(getAddressTokenSmartContract()).transfer(msg.sender, amount) == false) {
 			revert();
 		}
 	}
 
-	// Этот метод должен переводит токены из смарт-контракта маппинга _tokens на замороженое состояние для исполнителя
+	/* Этот метод должен переводит токены из внутринего баланса на замороженое состояние для исполнителя */
 	function 	transferTokensForExecutor(uint id, uint amount) public {
-		// assertToken(token);
-		// assertQuantity(amount);
-		// _tokens[token][msg.sender] = safeAdd(_tokens[token][msg.sender], amount);
-		// if (Token(token).transferFrom(msg.sender, this, amount) == false) {
-			// revert();
-		// }
+		bytes32 	hash;
 
-		// Как должен генерироваться конверт для исполнителя???? 
-		// 1. Хеш
-		// 2. .....
-	}
-//	 нам в принципе не нужен адресс токена
-// 	Этот метод должен завести деньги из вне смарт-контракта в конверт для исполнителя
-	function 	depositTokensForExecutor(address token, uint amount) public{
-	}
-	
-
-	function 	assertQuantity(uint amount) private pure {
-		if (amount == 0) {
-			revert();
-		}
+		require(amount != 0);
+		require(getExecutor(id) != (0x0));
+		hash = sha256(this, id, msg.sender);
 	}
 
-	function 	assertToken(address token) private pure {
-		if (token == 0) {
-			revert();
-		}
+	/* 	Метод для того чтобы завести токены на замороженое состояние исполнителя из внешнего баланса. */
+	function 	depositTokensForExecutor(int amount) public{
+	}
+
+	/* Метод для того чтобы добавить токенов на замороженом состоянии для исполнителя из внешнего баланса*/
+	function 	additionalDepositTokensForExecutor(int amount) public {
+		
+	}
+
+	/* Метод для того чтобы добавить токенов на замороженом состоянии для исполнителя из внутринего баланса*/
+	function 	additionalTransferTokensForExecutor(int amount) public {
+
 	}
 }

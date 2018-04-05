@@ -102,7 +102,7 @@ contract AdminPanel is Moderators, Admin {
 		returns _addressTokenSmartContract;
 	}
 
-	function 	balanceOf(address user) public constant returns (address) {
+	function 	_balanceOf(address user) public constant returns (address) {
 		returns _balanceOf[user];
 	}
 
@@ -132,8 +132,18 @@ contract AdminPanel is Moderators, Admin {
 	/* Пока все функции публично открыти и любой может по хешу узнать что-то кроме адреса исполнителя*/
 	// можно ограничить только для администраторов
 	// для исполнителя и для юзера который создал этот конверт
-	function 	myFunction() returns(bool res) internal {
-		
+	function 	setStrongBox(bytes32 hash, uint id, address user, uint amount) private {
+		require (user != (0x0));
+		require (id != 0);
+		require (amount != 0);
+
+		_strongboxList[hash].id = id;
+		_strongboxList[hash].amount = amount;
+		_strongboxList[hash].user = user;
+	}
+
+	function 	setAmount(bytes32 hash, uint amount) private {	
+		_strongboxList[hash] = amount;
 	}
 	
 	function 	getId(bytes32 hash) public constant returns (uint) {
@@ -142,7 +152,7 @@ contract AdminPanel is Moderators, Admin {
 	function 	getAmount(bytes32 hash) public constant returns (uint) {
 		return _strongboxList[hash].amount;
 	}
-	function 	getUser(bytes32 hash) public constant returns (uint) {
+	function 	getUser(bytes32 hash) public constant returns (address) {
 		return _strongboxList[hash].user;
 	}
 }
@@ -156,15 +166,16 @@ contract Crystals is SafeMath, AdminPanel {
 	/* Функция для того чтобы завести деньги на личный баланс в смарт-контракте*/
 	function 	depositTokensInWallet(uint amount) public {
 		require (amount != 0);
-		_balanceOf[msg.sender] = safeAdd(balanceOf[msg.sender], amount);
+		_balanceOf[msg.sender] = safeAdd(_balanceOf[msg.sender], amount);
 		if (Token(getAddressTokenSmartContract()).transferFrom(msg.sender, this, amount) == false) {
 			revert();
 		}
 	}
+
 	/* Функция для того чтобы вывести деньги с личного баланса обратно на адрес msg.sender*/
 	function 	withdrawTokensFromWallet(uint amount) public {
 		require (amount != 0);
-		_balanceOf[msg.sender] = safeSub(balanceOf[msg.sender], amount);
+		_balanceOf[msg.sender] = safeSub(_balanceOf[msg.sender], amount);
 		if (Token(getAddressTokenSmartContract()).transfer(msg.sender, amount) == false) {
 			revert();
 		}
@@ -172,24 +183,38 @@ contract Crystals is SafeMath, AdminPanel {
 
 	/* Этот метод должен переводит токены из внутринего баланса на замороженое состояние для исполнителя */
 	function 	transferTokensForExecutor(uint id, uint amount) public {
-		bytes32 	hash;
-
-		require(amount != 0);
-		require(getExecutor(id) != (0x0));
-		hash = sha256(this, id, msg.sender);
+		createStrongBox(id, amount);
+		_balanceOf[msg.sender] = safeSub(_balanceOf[msg.sender], amount);
 	}
 
-	/* 	Метод для того чтобы завести токены на замороженое состояние исполнителя из внешнего баланса. */
-	function 	depositTokensForExecutor(int amount) public{
-	}
+	// доп функционал на потом
+	// /* 	Метод для того чтобы завести токены на замороженое состояние исполнителя из внешнего баланса. */
+	// function 	depositTokensForExecutor(int amount) public {
+	// }
 
-	/* Метод для того чтобы добавить токенов на замороженом состоянии для исполнителя из внешнего баланса*/
-	function 	additionalDepositTokensForExecutor(int amount) public {
+	//  Метод для того чтобы добавить токенов на замороженом состоянии для исполнителя из внешнего баланса
+	// function 	additionalDepositTokensForExecutor(int amount) public {
 		
-	}
+	// }
 
 	/* Метод для того чтобы добавить токенов на замороженом состоянии для исполнителя из внутринего баланса*/
-	function 	additionalTransferTokensForExecutor(int amount) public {
+	// проверить функционал на работу
+	function 	additionalTransferTokensForExecutor(uint id, int amount) public {
+		bytes32 	hash;
 
+		require (getExecutor(id) != (0x0));
+		hash = sha256(this, id, msg.sender);
+		require (getId(hash) != 0);
+		setAmount(safeAdd(getAmount(hash), amount));
+		_balanceOf[msg.sender] = safeSub(_balanceOf[msg.sender], amount);
+	}
+	// проверить функционал на работу
+	function 	createStrongBox(uint id, uint amount) private {
+		bytes32 	hash;
+
+		require(getExecutor(id) != (0x0));
+		hash = sha256(this, id, msg.sender);
+		require(getId(hash) == 0); // если уже занят хеш тогда нельзя создавать еще конверт. Вероятность этого существует при повторном создании с этим же исполнителем договорености
+		setStrongBox(hash, id, msg.sender, amount)
 	}
 }

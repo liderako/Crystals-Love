@@ -133,10 +133,6 @@ contract AdminPanel is Moderators, Admin {
 	// можно ограничить только для администраторов
 	// для исполнителя и для юзера который создал этот конверт
 	function 	setStrongBox(bytes32 hash, uint id, address user, uint amount) private {
-		require (user != (0x0));
-		require (id != 0);
-		require (amount != 0);
-
 		_strongboxList[hash].id = id;
 		_strongboxList[hash].amount = amount;
 		_strongboxList[hash].user = user;
@@ -202,6 +198,8 @@ contract Crystals is SafeMath, AdminPanel {
 	function 	additionalTransferTokensForExecutor(uint id, int amount) public {
 		bytes32 	hash;
 
+		// require (id != 0);
+		// require (amount != 0);
 		require (getExecutor(id) != (0x0));
 		hash = sha256(this, id, msg.sender);
 		require (getId(hash) != 0);
@@ -217,4 +215,15 @@ contract Crystals is SafeMath, AdminPanel {
 		require(getId(hash) == 0); // если уже занят хеш тогда нельзя создавать еще конверт. Вероятность этого существует при повторном создании с этим же исполнителем договорености
 		setStrongBox(hash, id, msg.sender, amount)
 	}
+
+	// проверить функционал на работу
+	function 	cancelStrongBox(uint id) private {
+		bytes32 	hash;
+
+		require(getExecutor(id) != (0x0));
+		hash = sha256(this, id, msg.sender);
+		require(getId(hash) != 0); // проверка на то что заявка существовала
+		setStrongBox(hash, id, msg.sender, amount)
+	}
+	// добавить функционал для соглашение юзера передать деньги для исполнителя
 }

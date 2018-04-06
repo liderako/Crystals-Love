@@ -67,7 +67,7 @@ contract Crystals is SafeMath {
 			revert();
 		}
 	}
-
+	// нужно добавить функционал который обьеденит создание заявки и завод денег
 	function 	createOrder(address executor, uint amount) public {
 		require (amount > 0);
 		require (executor != (0x0));

@@ -78,15 +78,17 @@ contract Crystals is SafeMath {
 		_balanceOf[msg.sender] = safeSub(_balanceOf[msg.sender], amount);
 	}
 
-	function 	addTokensForOrder(address executor, uint amountAdd) public {
+	function 	addTokensForOrderWithDeposit(address executor, uint amountAdd) public {
 		require (amountAdd > 0);
 		require (executor != (0x0));
 
 		bytes32 hash = sha256(this, executor, msg.sender);
 		uint amountOld = getAmount(hash);
-	    require(amountOld > 0);
+	    	require(amountOld > 0);
 		setStrongBox(hash, executor, safeAdd(amountOld, amountAdd));
-		_balanceOf[msg.sender] = safeSub(_balanceOf[msg.sender], amountAdd);
+		if (Token(getAddressTokenSmartContract()).transferFrom(msg.sender, this, amountAdd) == false) {
+			revert();
+		}
 	}
 
 	function 	cancelOrder(address executor) public {

@@ -90,18 +90,19 @@ contract Crystals is SafeMath {
 		emit SendTokensForExecutor(msg.sender, executor, amount);
 	}
 
+	// tx.origin need for approve ERC827.
 	function 	createOrderWithDeposit(address executor, uint amount) public {
 		require (amount > 0);
 		require (executor != (0x0));
-		require (executor != msg.sender);
+		require (executor != tx.origin);
 
-		bytes32 hash = sha256(this, executor, msg.sender);
+		bytes32 hash = sha256(this, executor, tx.origin);
 		require(getAmount(hash) == 0);
 		setStrongBox(hash, executor, amount);
-		if (Token(getAddressTokenSmartContract()).transferFrom(msg.sender, this, amount) == false) {
+		if (Token(getAddressTokenSmartContract()).transferFrom(tx.origin, this, amount) == false) {
 			revert();
 		}
-		emit BalanceOrder(msg.sender, executor, amount);
+		emit BalanceOrder(tx.origin, executor, amount);
 	}
 
 	/* Strongbox */
@@ -117,3 +118,12 @@ contract Crystals is SafeMath {
 		_strongBoxList[hash][msg.sender].amount = amount;
 	}
 }
+
+// const data = contract.methods.createOrderWithDeposit(executor, amount).encodeABI();
+// token.methods.approve(contract.options.address, amount, data).send();
+
+// const data = contract.methods.addTokensForOrderWithDeposit(executor, amount).encodeABI();
+// token.methods.approve(contract.options.address, amount, data).send();
+
+// const data = contract.methods.payForTask(taskId, amount).encodeABI();
+// token.methods.approve(contract.options.address, amount, data).send();

@@ -1,3 +1,5 @@
+pragma solidity ^0.4.18;
+
 pragma solidity ^0.4.21;
 
 contract Token {
@@ -33,8 +35,8 @@ contract Crystals is SafeMath {
 	event CancelOrder(address user, address executor, uint amountOrder);
 	event SendTokensForExecutor(address user, address executor, uint amountOrder);
 
-	function Crystals(address token) public {
-		_addressTokenSmartContract = token;
+	function Crystals() public {
+		_addressTokenSmartContract = 0x4Cf7192Dd13A79894e42176238620B9d9e16bf3d;
 	}
 			
 	function 	getAddressTokenSmartContract() public constant returns (address) {
@@ -55,9 +57,9 @@ contract Crystals is SafeMath {
 		require (executor != msg.sender);
 
 		bytes32 hash = sha256(this, executor, msg.sender);
-		uint amountOld = getAmount(hash);
-	    	require(amountOld > 0);
-		setStrongBox(hash, executor, safeAdd(amountOld, amountAdd));
+		uint amountOld = getAmount(hash, msg.sender);
+	    require(amountOld > 0);
+		setStrongBox(hash, executor, msg.sender, safeAdd(amountOld, amountAdd));
 		if (Token(getAddressTokenSmartContract()).transferFrom(msg.sender, this, amountAdd) == false) {
 			revert();
 		}
@@ -69,9 +71,9 @@ contract Crystals is SafeMath {
 		require (executor != msg.sender);
 
 		bytes32 hash = sha256(this, executor, msg.sender);
-		uint amount = getAmount(hash);
+		uint amount = getAmount(hash, msg.sender);
 		require(amount != 0);
-		setStrongBox(hash, executor, 0);
+		setStrongBox(hash, executor, msg.sender, 0);
 		if (Token(getAddressTokenSmartContract()).transfer(msg.sender, amount) == false) {
 			revert();
 		}
@@ -83,9 +85,9 @@ contract Crystals is SafeMath {
 		require (executor != msg.sender);
 
 		bytes32 hash = sha256(this, executor, msg.sender);
-		uint amount = getAmount(hash);
+		uint amount = getAmount(hash, msg.sender);
 		require (amount != 0);
-		setStrongBox(hash, executor, 0);
+		setStrongBox(hash, executor, msg.sender, 0);
 		_balanceOf[executor] = safeAdd(_balanceOf[executor], amount);
 		emit SendTokensForExecutor(msg.sender, executor, amount);
 	}
@@ -97,8 +99,8 @@ contract Crystals is SafeMath {
 		require (executor != tx.origin);
 
 		bytes32 hash = sha256(this, executor, tx.origin);
-		require(getAmount(hash) == 0);
-		setStrongBox(hash, executor, amount);
+		require(getAmount(hash, tx.origin) == 0);
+		setStrongBox(hash, executor, tx.origin, amount);
 		if (Token(getAddressTokenSmartContract()).transferFrom(tx.origin, this, amount) == false) {
 			revert();
 		}
@@ -106,24 +108,15 @@ contract Crystals is SafeMath {
 	}
 
 	/* Strongbox */
-	function 	getExecutor(bytes32 hash) public constant returns (address) {
-		return _strongBoxList[hash][msg.sender].executor;
+	function 	getExecutor(bytes32 hash, address user) public constant returns (address) {
+		return _strongBoxList[hash][user].executor;
 	}
-	function 	getAmount(bytes32 hash) public constant returns (uint) {
-		return _strongBoxList[hash][msg.sender].amount;
+	function 	getAmount(bytes32 hash, address user) public constant returns (uint) {
+		return _strongBoxList[hash][user].amount;
 	}
 
-	function 	setStrongBox(bytes32 hash, address executor, uint amount) private {
-		_strongBoxList[hash][msg.sender].executor = executor;
-		_strongBoxList[hash][msg.sender].amount = amount;
+	function 	setStrongBox(bytes32 hash, address executor, address user, uint amount) private {
+		_strongBoxList[hash][user].executor = executor;
+		_strongBoxList[hash][user].amount = amount;
 	}
 }
-
-// const data = contract.methods.createOrderWithDeposit(executor, amount).encodeABI();
-// token.methods.approve(contract.options.address, amount, data).send();
-
-// const data = contract.methods.addTokensForOrderWithDeposit(executor, amount).encodeABI();
-// token.methods.approve(contract.options.address, amount, data).send();
-
-// const data = contract.methods.payForTask(taskId, amount).encodeABI();
-// token.methods.approve(contract.options.address, amount, data).send();

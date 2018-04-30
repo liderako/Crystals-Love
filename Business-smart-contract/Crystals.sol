@@ -1,67 +1,121 @@
+
 pragma solidity ^0.4.21;
 
 contract Token {
-	function transfer( address _to, uint256 _value ) public returns ( bool success );
-	function transferFrom( address _from, address _to, uint256 _value ) public returns ( bool success );
+	function transfer(address _to, uint256 _value) public returns (bool success);
+	function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
 }
 
 contract SafeMath {
-	function safeAdd( uint a, uint b ) internal pure returns ( uint ) {
+	function safeAdd(uint a, uint b) internal pure returns (uint) {
 		uint 	c;
 
 		c = a + b;
-		assert( c >= a && c >= b );
+		assert(c >= a && c >= b);
 		return c;
+	}
+	function safeSub( uint a, uint b ) internal pure returns ( uint ) {
+			assert( b <= a );
+			return a - b;
 	}
 }
 
 contract Crystals is SafeMath {
-
-	mapping ( bytes32 => mapping ( address => uint ) ) public _tokens;
-
-	function 	depositEth() payable public {
- 		assertQuantity( msg.value );
-		_tokens[0][msg.sender] = safeAdd( _tokens[0][msg.sender], msg.value );
-	//	Deposit( 0, msg.sender, msg.value, _tokens[0][msg.sender] );
- 	}
-
-	function 	withdrawEth( uint amount ) public {
-		assertQuantity( amount );
-		_tokens[0][msg.sender] = safeSub( _tokens[0][msg.sender], amount );
-		msg.sender.transfer( amount );
-	//	Withdraw( 0, msg.sender, amount, _tokens[0][msg.sender] );
+	struct Strongbox{
+		address executor;
+		uint 	amount;		
 	}
 
-	function 	depositToken( address token, uint amount ) public {
-		assertToken( token );
-		assertQuantity( amount );
-		_tokens[token][msg.sender] = safeAdd( _tokens[token][msg.sender], amount );
-		if ( Token( token ).transferFrom( msg.sender, this, amount ) == false ) {
-			assert( false );
-		}
-	//	Deposit( token, msg.sender, amount , _tokens[token][msg.sender] );
+	mapping(address => uint) public _balanceOf;
+	mapping(bytes32 => mapping(address => Strongbox)) private _strongBoxList;
+	
+    address 					private	_addressTokenSmartContract;
+	event BalanceOrder(address user, address executor, uint amountOrder);
+	event CancelOrder(address user, address executor, uint amountOrder);
+	event SendTokensForExecutor(address user, address executor, uint amountOrder);
+
+	function Crystals() public {
+		_addressTokenSmartContract = 0x4Cf7192Dd13A79894e42176238620B9d9e16bf3d;
+	}
+			
+	function 	getAddressTokenSmartContract() public constant returns (address) {
+		return _addressTokenSmartContract;
 	}
 
-	function 	withdrawToken( address token, uint amount ) public {
-		assertToken( token );
-		assertQuantity( amount );
-
-		_tokens[token][msg.sender] = safeSub( _tokens[token][msg.sender], amount );
-		if ( Token( token ).transfer( msg.sender, amount ) == false ) {
-			assert( false );
-		}
-		//Withdraw( token, msg.sender, amount, _tokens[token][msg.sender] );
-	}
-
-	function 	assertQuantity( uint amount ) private pure {
-		if ( amount == 0 ) {
-			require( false );
+	function 	withdrawTokensFromWallet(uint amount) public {
+		require (amount != 0);
+		_balanceOf[msg.sender] = safeSub(_balanceOf[msg.sender], amount);
+		if (Token(getAddressTokenSmartContract()).transfer(msg.sender, amount) == false) {
+			revert();
 		}
 	}
 
-	function 	assertToken( address token ) private pure {
-		if ( token == 0 ) {
-			require( false );
+	function 	addTokensForOrderWithDeposit(address executor, uint amountAdd) public {
+		require (amountAdd > 0);
+		require (executor != (0x0));
+		require (executor != msg.sender);
+
+		bytes32 hash = sha256(this, executor, msg.sender);
+		uint amountOld = getAmount(hash, msg.sender);
+	    require(amountOld > 0);
+		setStrongBox(hash, executor, msg.sender, safeAdd(amountOld, amountAdd));
+		if (Token(getAddressTokenSmartContract()).transferFrom(msg.sender, this, amountAdd) == false) {
+			revert();
 		}
+		emit BalanceOrder(msg.sender, executor, safeAdd(amountOld, amountAdd));
+	}
+
+	function 	cancelOrder(address executor) public {
+		require (executor != (0x0));
+		require (executor != msg.sender);
+
+		bytes32 hash = sha256(this, executor, msg.sender);
+		uint amount = getAmount(hash, msg.sender);
+		require(amount != 0);
+		setStrongBox(hash, executor, msg.sender, 0);
+		if (Token(getAddressTokenSmartContract()).transfer(msg.sender, amount) == false) {
+			revert();
+		}
+		emit CancelOrder(msg.sender, executor, amount);
+	}
+
+	function 	sendTokensForExecutor(address executor) public {
+		require(executor != (0x0));
+		require (executor != msg.sender);
+
+		bytes32 hash = sha256(this, executor, msg.sender);
+		uint amount = getAmount(hash, msg.sender);
+		require (amount != 0);
+		setStrongBox(hash, executor, msg.sender, 0);
+		_balanceOf[executor] = safeAdd(_balanceOf[executor], amount);
+		emit SendTokensForExecutor(msg.sender, executor, amount);
+	}
+
+	// tx.origin need for approve ERC827.
+	function 	createOrderWithDeposit(address executor, uint amount) public {
+		require (amount > 0);
+		require (executor != (0x0));
+		require (executor != tx.origin);
+
+		bytes32 hash = sha256(this, executor, tx.origin);
+		require(getAmount(hash, tx.origin) == 0);
+		setStrongBox(hash, executor, tx.origin, amount);
+		if (Token(getAddressTokenSmartContract()).transferFrom(tx.origin, this, amount) == false) {
+			revert();
+		}
+		emit BalanceOrder(tx.origin, executor, amount);
+	}
+
+	/* Strongbox */
+	function 	getExecutor(bytes32 hash, address user) public constant returns (address) {
+		return _strongBoxList[hash][user].executor;
+	}
+	function 	getAmount(bytes32 hash, address user) public constant returns (uint) {
+		return _strongBoxList[hash][user].amount;
+	}
+
+	function 	setStrongBox(bytes32 hash, address executor, address user, uint amount) private {
+		_strongBoxList[hash][user].executor = executor;
+		_strongBoxList[hash][user].amount = amount;
 	}
 }
